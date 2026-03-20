@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logrotate Training Document</title>
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-card: #1e293b;
+      --bg-code: #0d1117;
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-heading: #f1f5f9;
+      --accent: #38bdf8;
+      --accent-dim: #0ea5e9;
+      --accent-green: #4ade80;
+      --accent-yellow: #fbbf24;
+      --accent-red: #f87171;
+      --accent-purple: #a78bfa;
+      --border: #334155;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      padding: 0;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      color: var(--accent);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+
+    .hero .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .hero .badge {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--accent);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-top: 20px;
+    }
+
+    /* Navigation */
+    .toc {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      max-width: 900px;
+      margin: -30px auto 40px;
+      padding: 30px 36px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .toc h2 {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px;
+    }
+
+    .toc a {
+      color: var(--accent);
+      text-decoration: none;
+      padding: 6px 0;
+      display: block;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+
+    .toc a:hover {
+      color: #7dd3fc;
+    }
+
+    .toc a::before {
+      content: "\2192\00a0";
+      color: var(--border);
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    section {
+      margin-bottom: 56px;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+      color: var(--text-heading);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    h2 .section-number {
+      color: var(--accent);
+      margin-right: 8px;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      color: var(--accent);
+      margin: 28px 0 12px;
+    }
+
+    p {
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+
+    /* Info Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .card-accent {
+      border-left: 3px solid var(--accent);
+    }
+
+    .card-green {
+      border-left: 3px solid var(--accent-green);
+    }
+
+    .card-yellow {
+      border-left: 3px solid var(--accent-yellow);
+    }
+
+    .card-red {
+      border-left: 3px solid var(--accent-red);
+    }
+
+    .card h4 {
+      font-size: 1rem;
+      color: var(--text-heading);
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      margin-bottom: 0;
+    }
+
+    /* Code Blocks */
+    pre {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      overflow-x: auto;
+      margin: 16px 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+      color: var(--accent-green);
+    }
+
+    pre code {
+      color: var(--text-primary);
+    }
+
+    .comment {
+      color: #6a737d;
+    }
+
+    .keyword {
+      color: var(--accent-purple);
+    }
+
+    .value {
+      color: var(--accent-green);
+    }
+
+    .path {
+      color: var(--accent-yellow);
+    }
+
+    .cmd {
+      color: var(--accent);
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.92rem;
+    }
+
+    thead th {
+      background: var(--bg-code);
+      color: var(--accent);
+      text-align: left;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+
+    tbody td {
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(30, 41, 59, 0.5);
+    }
+
+    tbody td code {
+      color: var(--accent-green);
+      font-size: 0.88rem;
+    }
+
+    /* Lists */
+    ul, ol {
+      padding-left: 24px;
+      margin-bottom: 14px;
+      color: var(--text-secondary);
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    /* Diagram / Flow */
+    .flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0;
+      margin: 24px 0;
+    }
+
+    .flow-step {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 20px;
+      text-align: center;
+      min-width: 120px;
+    }
+
+    .flow-step .step-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .flow-step .step-title {
+      font-size: 0.95rem;
+      color: var(--text-heading);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .flow-arrow {
+      color: var(--accent);
+      font-size: 1.4rem;
+      padding: 0 8px;
+    }
+
+    /* Highlight boxes */
+    .highlight {
+      background: rgba(56, 189, 248, 0.06);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 8px;
+      padding: 18px 22px;
+      margin: 16px 0;
+    }
+
+    .highlight-warn {
+      background: rgba(251, 191, 36, 0.06);
+      border-color: rgba(251, 191, 36, 0.25);
+    }
+
+    .highlight strong {
+      color: var(--accent);
+    }
+
+    .highlight-warn strong {
+      color: var(--accent-yellow);
+    }
+
+    /* Directive grid */
+    .directive-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    @media (max-width: 640px) {
+      .directive-group {
+        grid-template-columns: 1fr;
+      }
+      .hero h1 {
+        font-size: 2rem;
+      }
+      .flow {
+        flex-direction: column;
+      }
+      .flow-arrow {
+        transform: rotate(90deg);
+      }
+    }
+
+    .directive-item {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 16px;
+    }
+
+    .directive-item code {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .directive-item span {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      border-top: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>logrotate</h1>
+    <p class="subtitle">A complete training guide to Linux's log file rotation utility &mdash; rotation, compression, removal, and mailing of system logs.</p>
+    <span class="badge">logrotate &middot; Linux System Administration</span>
+  </div>
+
+  <!-- Table of Contents -->
+  <nav class="toc">
+    <h2>Contents</h2>
+    <div class="toc-grid">
+      <a href="#what-is">What Is Logrotate?</a>
+      <a href="#why">Why Use Logrotate?</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#cli-usage">Command-Line Usage</a>
+      <a href="#config">Configuration File</a>
+      <a href="#directives">All Directives Reference</a>
+      <a href="#scripts">Scripts &amp; Hooks</a>
+      <a href="#services">Linux Services &amp; Integration</a>
+      <a href="#examples">Practical Examples</a>
+      <a href="#best-practices">Best Practices</a>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- Section 1: What Is Logrotate? -->
+    <section id="what-is">
+      <h2><span class="section-number">01</span> What Is Logrotate?</h2>
+      <p>
+        <code>logrotate</code> is a standard Linux utility designed to simplify the administration of systems
+        that generate large volumes of log files. It automates the lifecycle management of logs: rotating them
+        on a schedule (or by size), compressing old logs to save disk space, removing aged-out files, and
+        optionally mailing them to administrators.
+      </p>
+
+      <div class="card card-accent">
+        <h4>Core Capabilities</h4>
+        <ul>
+          <li><strong>Rotation</strong> &mdash; Rename current log and start a fresh one, keeping a configurable number of old copies.</li>
+          <li><strong>Compression</strong> &mdash; Compress rotated logs with gzip (default), bzip2, xz, or any custom compressor.</li>
+          <li><strong>Removal</strong> &mdash; Automatically delete logs older than a defined age or count.</li>
+          <li><strong>Mailing</strong> &mdash; Email log files to a specified address before they are removed.</li>
+          <li><strong>Script execution</strong> &mdash; Run pre-rotation and post-rotation shell scripts (e.g., to restart a service).</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 2: Why -->
+    <section id="why">
+      <h2><span class="section-number">02</span> Why Use Logrotate?</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="card card-green">
+          <h4>Prevents Disk Exhaustion</h4>
+          <p>Unmanaged logs can fill a filesystem and cause service outages. Logrotate enforces size and age limits.</p>
+        </div>
+        <div class="card card-green">
+          <h4>Preserves History</h4>
+          <p>Keeps a controlled number of rotated/compressed copies for forensics and auditing purposes.</p>
+        </div>
+        <div class="card card-green">
+          <h4>Automates Maintenance</h4>
+          <p>Runs unattended via cron/systemd timer &mdash; no manual intervention needed.</p>
+        </div>
+        <div class="card card-green">
+          <h4>Per-Service Configuration</h4>
+          <p>Each application can have its own rotation rules (frequency, retention, scripts).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: How It Works -->
+    <section id="how-it-works">
+      <h2><span class="section-number">03</span> How It Works</h2>
+      <p>Logrotate is not a daemon &mdash; it is a command-line tool that is invoked periodically (typically once per day) by <code>cron</code> or a <code>systemd timer</code>.</p>
+
+      <div class="flow">
+        <div class="flow-step">
+          <div class="step-label">Step 1</div>
+          <div class="step-title">Cron / Timer Fires</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="step-label">Step 2</div>
+          <div class="step-title">Read Config Files</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="step-label">Step 3</div>
+          <div class="step-title">Check Criteria</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="step-label">Step 4</div>
+          <div class="step-title">Rotate &amp; Compress</div>
+        </div>
+        <div class="flow-arrow">&rarr;</div>
+        <div class="flow-step">
+          <div class="step-label">Step 5</div>
+          <div class="step-title">Run Scripts</div>
+        </div>
+      </div>
+
+      <h3>State File</h3>
+      <p>Logrotate tracks when each log was last rotated in a <strong>state file</strong> (default: <code>/var/lib/logrotate/logrotate.status</code>). This allows time-based rotation decisions (daily, weekly, monthly) to survive reboots and skipped cron runs. The state file is locked during execution to prevent parallel runs from conflicting.</p>
+    </section>
+
+    <!-- Section 4: CLI Usage -->
+    <section id="cli-usage">
+      <h2><span class="section-number">04</span> Command-Line Usage</h2>
+
+      <pre><code><span class="cmd">logrotate</span> [OPTIONS] config_file [config_file2 ...]</code></pre>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Option</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>-f, --force</code></td><td>Force rotation even if logrotate doesn't think it is necessary.</td></tr>
+          <tr><td><code>-d, --debug</code></td><td>Dry-run mode. No changes are made; only debug messages are printed.</td></tr>
+          <tr><td><code>-v, --verbose</code></td><td>Display informational messages during rotation.</td></tr>
+          <tr><td><code>-s, --state FILE</code></td><td>Use an alternate state file instead of the default.</td></tr>
+          <tr><td><code>--skip-state-lock</code></td><td>Do not lock the state file (for environments where locking is unsupported).</td></tr>
+          <tr><td><code>-l, --log FILE</code></td><td>Write verbose output to the specified log file (overwritten each run).</td></tr>
+          <tr><td><code>-m, --mail CMD</code></td><td>Specify the mail command (default: <code>/bin/mail</code>).</td></tr>
+          <tr><td><code>--version</code></td><td>Print version information.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Common Invocations</h3>
+      <pre><code><span class="comment"># Normal daily run (how cron calls it)</span>
+<span class="cmd">/usr/sbin/logrotate</span> /etc/logrotate.conf
+
+<span class="comment"># Dry-run to test a new configuration</span>
+<span class="cmd">logrotate</span> <span class="keyword">-d</span> /etc/logrotate.d/myapp
+
+<span class="comment"># Force rotation with verbose output</span>
+<span class="cmd">logrotate</span> <span class="keyword">-fv</span> /etc/logrotate.d/nginx
+
+<span class="comment"># Use a custom state file (useful for non-root users)</span>
+<span class="cmd">logrotate</span> <span class="keyword">-s</span> <span class="path">~/.logrotate.status</span> <span class="path">~/myapp-logrotate.conf</span></code></pre>
+    </section>
+
+    <!-- Section 5: Configuration -->
+    <section id="config">
+      <h2><span class="section-number">05</span> Configuration File Structure</h2>
+      <p>Logrotate configuration consists of <strong>global directives</strong> (applied to all log blocks unless overridden) and <strong>log-specific blocks</strong> enclosed in curly braces.</p>
+
+      <h3>File Locations</h3>
+      <table>
+        <thead>
+          <tr><th>Path</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>/etc/logrotate.conf</code></td><td>Main configuration file. Sets global defaults and includes the drop-in directory.</td></tr>
+          <tr><td><code>/etc/logrotate.d/</code></td><td>Drop-in directory. Each installed package places its own config file here.</td></tr>
+          <tr><td><code>/var/lib/logrotate/logrotate.status</code></td><td>State file tracking last rotation timestamps.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Anatomy of a Configuration File</h3>
+      <pre><code><span class="comment"># Global options (apply to all blocks below unless overridden)</span>
+<span class="keyword">weekly</span>
+<span class="keyword">rotate</span> <span class="value">4</span>
+<span class="keyword">create</span>
+<span class="keyword">dateext</span>
+<span class="keyword">compress</span>
+
+<span class="comment"># Include per-application configs</span>
+<span class="keyword">include</span> <span class="path">/etc/logrotate.d</span>
+
+<span class="comment"># A specific log block</span>
+<span class="path">/var/log/wtmp</span> {
+    <span class="keyword">monthly</span>
+    <span class="keyword">create</span> <span class="value">0664 root utmp</span>
+    <span class="keyword">minsize</span> <span class="value">1M</span>
+    <span class="keyword">rotate</span> <span class="value">1</span>
+}</code></pre>
+
+      <div class="highlight">
+        <strong>Key rules:</strong> Comments start with <code>#</code>. Later config files override earlier ones. If a directory is given on the command line, every file inside it is treated as a config file. Values are separated from directives by whitespace and/or <code>=</code>.
+      </div>
+    </section>
+
+    <!-- Section 6: Directives Reference -->
+    <section id="directives">
+      <h2><span class="section-number">06</span> Configuration Directives Reference</h2>
+
+      <h3>Rotation Control</h3>
+      <div class="directive-group">
+        <div class="directive-item">
+          <code>rotate <em>count</em></code>
+          <span>Keep <em>count</em> rotated copies. Default: 0.<br>0 = delete immediately.<br>-1 = never delete.</span>
+        </div>
+        <div class="directive-item">
+          <code>olddir <em>directory</em></code>
+          <span>Move rotated logs to this directory (must be on same device unless using copy/copytruncate).</span>
+        </div>
+        <div class="directive-item">
+          <code>noolddir</code>
+          <span>Rotate logs in-place (overrides olddir).</span>
+        </div>
+        <div class="directive-item">
+          <code>su <em>user group</em></code>
+          <span>Rotate files as this user/group instead of root.</span>
+        </div>
+      </div>
+
+      <h3>Frequency</h3>
+      <div class="directive-group">
+        <div class="directive-item">
+          <code>hourly</code>
+          <span>Rotate every hour (requires hourly cron).</span>
+        </div>
+        <div class="directive-item">
+          <code>daily</code>
+          <span>Rotate every day.</span>
+        </div>
+        <div class="directive-item">
+          <code>weekly [<em>weekday</em>]</code>
+          <span>Rotate weekly. 0=Sun ... 6=Sat, 7=every 7 days.</span>
+        </div>
+        <div class="directive-item">
+          <code>monthly</code>
+          <span>Rotate on the first run of each month.</span>
+        </div>
+        <div class="directive-item">
+          <code>yearly</code>
+          <span>Rotate if the year has changed.</span>
+        </div>
+        <div class="directive-item">
+          <code>size <em>N</em>[k|M|G]</code>
+          <span>Rotate when file exceeds this size (ignores time schedule).</span>
+        </div>
+      </div>
+
+      <h3>File Selection</h3>
+      <div class="directive-group">
+        <div class="directive-item">
+          <code>missingok</code>
+          <span>Don't error if the log file is missing.</span>
+        </div>
+        <div class="directive-item">
+          <code>nomissingok</code>
+          <span>Error if the log file is missing (default).</span>
+        </div>
+        <div class="directive-item">
+          <code>notifempty</code>
+          <span>Skip rotation if the log is empty.</span>
+        </div>
+        <div class="directive-item">
+          <code>ifempty</code>
+          <span>Rotate even if the log is empty (default).</span>
+        </div>
+        <div class="directive-item">
+          <code>minage <em>days</em></code>
+          <span>Don't rotate logs younger than this.</span>
+        </div>
+        <div class="directive-item">
+          <code>maxage <em>days</em></code>
+          <span>Delete rotated logs older than this.</span>
+        </div>
+        <div class="directive-item">
+          <code>minsize <em>N</em></code>
+          <span>Rotate only if size AND time criteria are met.</span>
+        </div>
+        <div class="directive-item">
+          <code>maxsize <em>N</em></code>
+          <span>Rotate if size is exceeded, even before time interval.</span>
+        </div>
+      </div>
+
+      <h3>File Creation &amp; Handling</h3>
+      <div class="directive-group">
+        <div class="directive-item">
+          <code>create <em>mode owner group</em></code>
+          <span>Create a new empty log file after rotation with specified permissions.</span>
+        </div>
+        <div class="directive-item">
+          <code>nocreate</code>
+          <span>Don't create a new log file after rotation.</span>
+        </div>
+        <div class="directive-item">
+          <code>copy</code>
+          <span>Copy the log but don't modify the original. Useful for snapshots.</span>
+        </div>
+        <div class="directive-item">
+          <code>copytruncate</code>
+          <span>Copy the log, then truncate the original to zero. For apps that can't reopen log files.</span>
+        </div>
+        <div class="directive-item">
+          <code>renamecopy</code>
+          <span>Rename log to .tmp, run postrotate, then copy to final name.</span>
+        </div>
+        <div class="directive-item">
+          <code>shred / noshred</code>
+          <span>Securely delete old logs using <code>shred -u</code> instead of unlink.</span>
+        </div>
+      </div>
+
+      <h3>Compression</h3>
+      <div class="directive-group">
+        <div class="directive-item">
+          <code>compress / nocompress</code>
+          <span>Enable/disable gzip compression on rotated files.</span>
+        </div>
+        <div class="directive-item">
+          <code>compresscmd <em>cmd</em></code>
+          <span>Use a custom compressor (e.g., bzip2, xz).</span>
+        </div>
+        <div class="directive-item">
+          <code>compressext <em>ext</em></code>
+          <span>Custom extension for compressed files.</span>
+        </div>
+        <div class="directive-item">
+          <code>compressoptions <em>opts</em></code>
+          <span>Options passed to compressor. Default: <code>-6</code> for gzip.</span>
+        </div>
+        <div class="directive-item">
+          <code>delaycompress</code>
+          <span>Don't compress until the next rotation cycle. Useful if apps keep writing to the old file briefly.</span>
+        </div>
+        <div class="directive-item">
+          <code>uncompresscmd <em>cmd</em></code>
+          <span>Command to decompress (default: gunzip).</span>
+        </div>
+      </div>
+
+      <h3>Filename Customization</h3>
+      <div class="directive-group">
+        <div class="directive-item">
+          <code>dateext / nodateext</code>
+          <span>Use date-based extensions (YYYYMMDD) instead of numeric.</span>
+        </div>
+        <div class="directive-item">
+          <code>dateformat <em>fmt</em></code>
+          <span>strftime-style format for date extensions. Must be lexically sortable.</span>
+        </div>
+        <div class="directive-item">
+          <code>dateyesterday</code>
+          <span>Use yesterday's date for the extension name.</span>
+        </div>
+        <div class="directive-item">
+          <code>start <em>N</em></code>
+          <span>Start numbering rotated files at N (default: 1).</span>
+        </div>
+        <div class="directive-item">
+          <code>extension <em>ext</em></code>
+          <span>Preserve a file extension after rotation (e.g., <code>.log</code>).</span>
+        </div>
+        <div class="directive-item">
+          <code>addextension <em>ext</em></code>
+          <span>Append an extension to rotated files.</span>
+        </div>
+      </div>
+
+      <h3>Mail</h3>
+      <div class="directive-group">
+        <div class="directive-item">
+          <code>mail <em>address</em></code>
+          <span>Mail log to this address when it is about to be removed.</span>
+        </div>
+        <div class="directive-item">
+          <code>nomail</code>
+          <span>Don't mail old logs.</span>
+        </div>
+        <div class="directive-item">
+          <code>mailfirst</code>
+          <span>Mail the just-rotated file.</span>
+        </div>
+        <div class="directive-item">
+          <code>maillast</code>
+          <span>Mail the about-to-expire file (default).</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7: Scripts -->
+    <section id="scripts">
+      <h2><span class="section-number">07</span> Scripts &amp; Hooks</h2>
+      <p>Logrotate can execute shell scripts at various points during the rotation lifecycle. Scripts run between a starting keyword and <code>endscript</code>, executed via <code>/bin/sh</code>.</p>
+
+      <table>
+        <thead>
+          <tr><th>Directive</th><th>When It Runs</th><th>Argument</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>firstaction</code></td>
+            <td>Once before any matching log is rotated.</td>
+            <td>Whole glob pattern.</td>
+          </tr>
+          <tr>
+            <td><code>prerotate</code></td>
+            <td>Before each log file is rotated.</td>
+            <td>Absolute path of the log (or pattern if <code>sharedscripts</code>).</td>
+          </tr>
+          <tr>
+            <td><code>postrotate</code></td>
+            <td>After each log file is rotated.</td>
+            <td>Absolute path of original + rotated file (or pattern if <code>sharedscripts</code>).</td>
+          </tr>
+          <tr>
+            <td><code>lastaction</code></td>
+            <td>Once after all matching logs are rotated.</td>
+            <td>Whole glob pattern.</td>
+          </tr>
+          <tr>
+            <td><code>preremove</code></td>
+            <td>Just before a log file is removed.</td>
+            <td>Name of the file about to be deleted.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>sharedscripts vs nosharedscripts</h3>
+      <div class="card card-yellow">
+        <h4>sharedscripts</h4>
+        <p>The <code>prerotate</code> and <code>postrotate</code> scripts run only <strong>once</strong> per block, even if the block matches multiple files (e.g., a wildcard pattern). The whole pattern is passed as the first argument. If an error occurs in any script, remaining actions are skipped for <em>all</em> matching logs.</p>
+      </div>
+      <div class="card card-accent">
+        <h4>nosharedscripts (default)</h4>
+        <p>Scripts run once <strong>per log file</strong>. Each invocation receives the absolute path of the specific file being rotated. An error in a script only stops further actions for that one file.</p>
+      </div>
+    </section>
+
+    <!-- Section 8: Services -->
+    <section id="services">
+      <h2><span class="section-number">08</span> Linux Services &amp; Integration</h2>
+      <p>Logrotate itself is not a service. It relies on and integrates with the following system components:</p>
+
+      <table>
+        <thead>
+          <tr><th>Service / Component</th><th>Role</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>cron</code> (crond)</td>
+            <td>The traditional scheduler. A daily cron job at <code>/etc/cron.daily/logrotate</code> invokes logrotate once per day. This is the most common trigger mechanism.</td>
+          </tr>
+          <tr>
+            <td><code>systemd timer</code></td>
+            <td>On modern distributions (RHEL/CentOS 7+, Fedora, Ubuntu 16.04+), a systemd timer (<code>logrotate.timer</code> / <code>logrotate.service</code>) replaces the cron job. Check with <code>systemctl list-timers</code>.</td>
+          </tr>
+          <tr>
+            <td><code>/bin/sh</code></td>
+            <td>All embedded scripts (prerotate, postrotate, etc.) are executed by the system shell.</td>
+          </tr>
+          <tr>
+            <td><code>/bin/mail</code></td>
+            <td>Default mail transport used to email rotated logs. Can be overridden with the <code>-m</code> flag or the <code>mail</code> directive.</td>
+          </tr>
+          <tr>
+            <td><code>gzip</code> / <code>gunzip</code></td>
+            <td>Default compression/decompression utilities. Configurable via <code>compresscmd</code> and <code>uncompresscmd</code>.</td>
+          </tr>
+          <tr>
+            <td><code>shred</code></td>
+            <td>GNU coreutils secure deletion tool, optionally used when the <code>shred</code> directive is enabled.</td>
+          </tr>
+          <tr>
+            <td><code>SELinux / ACLs</code></td>
+            <td>On systems with SELinux, logrotate must operate within its security context. The <code>create</code> directive sets ownership/mode; the <code>su</code> directive controls execution identity.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Checking Your Trigger Mechanism</h3>
+      <pre><code><span class="comment"># Check if a systemd timer is active</span>
+<span class="cmd">systemctl</span> status logrotate.timer
+
+<span class="comment"># Check if cron is being used instead</span>
+<span class="cmd">ls -lha</span> <span class="path">/etc/cron.daily/logrotate</span>
+
+<span class="comment"># See timer schedule</span>
+<span class="cmd">systemctl</span> list-timers --all | grep logrotate</code></pre>
+    </section>
+
+    <!-- Section 9: Examples -->
+    <section id="examples">
+      <h2><span class="section-number">09</span> Practical Examples</h2>
+
+      <h3>Example 1: Basic Web Server Logs</h3>
+      <pre><code><span class="comment"># /etc/logrotate.d/nginx</span>
+<span class="path">/var/log/nginx/*.log</span> {
+    <span class="keyword">daily</span>
+    <span class="keyword">missingok</span>
+    <span class="keyword">rotate</span> <span class="value">14</span>
+    <span class="keyword">compress</span>
+    <span class="keyword">delaycompress</span>
+    <span class="keyword">notifempty</span>
+    <span class="keyword">create</span> <span class="value">0640 www-data adm</span>
+    <span class="keyword">sharedscripts</span>
+    <span class="keyword">postrotate</span>
+        <span class="comment"># Signal nginx to reopen log files</span>
+        [ -f /var/run/nginx.pid ] && kill -USR1 $(cat /var/run/nginx.pid)
+    <span class="keyword">endscript</span>
+}</code></pre>
+      <div class="card card-accent">
+        <h4>What this does</h4>
+        <p>Rotates all <code>.log</code> files in <code>/var/log/nginx/</code> daily. Keeps 14 compressed copies. Delays compression by one cycle (so the most recent rotated file stays uncompressed for tools that may still be reading it). After rotation, sends <code>USR1</code> to nginx so it reopens its log file handles. The script runs only once for all matched files (<code>sharedscripts</code>).</p>
+      </div>
+
+      <h3>Example 2: Application with copytruncate</h3>
+      <pre><code><span class="comment"># /etc/logrotate.d/myapp</span>
+<span class="path">/opt/myapp/logs/app.log</span> {
+    <span class="keyword">size</span> <span class="value">50M</span>
+    <span class="keyword">rotate</span> <span class="value">10</span>
+    <span class="keyword">compress</span>
+    <span class="keyword">copytruncate</span>
+    <span class="keyword">missingok</span>
+    <span class="keyword">notifempty</span>
+    <span class="keyword">su</span> <span class="value">appuser appgroup</span>
+    <span class="keyword">olddir</span> <span class="path">/opt/myapp/logs/archive</span>
+    <span class="keyword">createolddir</span> <span class="value">0750 appuser appgroup</span>
+}</code></pre>
+      <div class="card card-accent">
+        <h4>What this does</h4>
+        <p>For applications that cannot reopen their log file (they hold a persistent file descriptor), <code>copytruncate</code> copies the log and then truncates the original to zero bytes. Rotation triggers when the file exceeds 50 MB. Old logs are moved to an <code>archive</code> subdirectory (created automatically if it doesn't exist). The <code>su</code> directive ensures operations run as <code>appuser:appgroup</code>.</p>
+      </div>
+
+      <h3>Example 3: Date-Based Rotation with Mailing</h3>
+      <pre><code><span class="comment"># /etc/logrotate.d/audit</span>
+<span class="path">/var/log/audit/audit.log</span> {
+    <span class="keyword">monthly</span>
+    <span class="keyword">rotate</span> <span class="value">12</span>
+    <span class="keyword">compress</span>
+    <span class="keyword">dateext</span>
+    <span class="keyword">dateformat</span> <span class="value">-%Y%m%d</span>
+    <span class="keyword">maxage</span> <span class="value">365</span>
+    <span class="keyword">mail</span> <span class="value">admin@example.com</span>
+    <span class="keyword">maillast</span>
+    <span class="keyword">create</span> <span class="value">0600 root root</span>
+    <span class="keyword">postrotate</span>
+        /sbin/service auditd restart
+    <span class="keyword">endscript</span>
+}</code></pre>
+      <div class="card card-accent">
+        <h4>What this does</h4>
+        <p>Rotates the audit log monthly, keeping 12 copies. Files are named with date extensions (e.g., <code>audit.log-20260301.gz</code>). Logs older than 365 days are mailed to the administrator before deletion. The audit daemon is restarted after rotation.</p>
+      </div>
+
+      <h3>Example 4: High-Volume Microservice</h3>
+      <pre><code><span class="comment"># /etc/logrotate.d/microservice</span>
+<span class="path">/var/log/microservice/*.log</span> {
+    <span class="keyword">hourly</span>
+    <span class="keyword">rotate</span> <span class="value">168</span>            <span class="comment"># 7 days * 24 hours</span>
+    <span class="keyword">missingok</span>
+    <span class="keyword">notifempty</span>
+    <span class="keyword">compress</span>
+    <span class="keyword">compresscmd</span> <span class="value">/usr/bin/xz</span>
+    <span class="keyword">compressext</span> <span class="value">.xz</span>
+    <span class="keyword">uncompresscmd</span> <span class="value">/usr/bin/unxz</span>
+    <span class="keyword">dateext</span>
+    <span class="keyword">dateformat</span> <span class="value">-%Y%m%d%H</span>
+    <span class="keyword">maxsize</span> <span class="value">200M</span>
+    <span class="keyword">sharedscripts</span>
+    <span class="keyword">postrotate</span>
+        /usr/bin/systemctl reload microservice
+    <span class="keyword">endscript</span>
+}</code></pre>
+      <div class="card card-accent">
+        <h4>What this does</h4>
+        <p>Handles high-volume logs that need hourly rotation. Uses xz compression for better ratios. Also triggers if any single file exceeds 200 MB before the hour is up (<code>maxsize</code>). Keeps a week of hourly backups (168 copies). Requires the cron/timer to run hourly, not just daily.</p>
+      </div>
+
+      <h3>Example 5: Complete /etc/logrotate.conf</h3>
+      <pre><code><span class="comment"># /etc/logrotate.conf - Global configuration</span>
+
+<span class="comment"># Rotate weekly by default</span>
+<span class="keyword">weekly</span>
+
+<span class="comment"># Keep 4 weeks of old logs</span>
+<span class="keyword">rotate</span> <span class="value">4</span>
+
+<span class="comment"># Create new (empty) log files after rotating old ones</span>
+<span class="keyword">create</span>
+
+<span class="comment"># Use date-based extensions</span>
+<span class="keyword">dateext</span>
+
+<span class="comment"># Compress rotated logs</span>
+<span class="keyword">compress</span>
+
+<span class="comment"># Include per-package configs</span>
+<span class="keyword">include</span> <span class="path">/etc/logrotate.d</span>
+
+<span class="comment"># System logs that aren't covered by packages</span>
+<span class="path">/var/log/wtmp</span> {
+    <span class="keyword">monthly</span>
+    <span class="keyword">create</span> <span class="value">0664 root utmp</span>
+    <span class="keyword">minsize</span> <span class="value">1M</span>
+    <span class="keyword">rotate</span> <span class="value">1</span>
+}
+
+<span class="path">/var/log/btmp</span> {
+    <span class="keyword">missingok</span>
+    <span class="keyword">monthly</span>
+    <span class="keyword">create</span> <span class="value">0600 root utmp</span>
+    <span class="keyword">rotate</span> <span class="value">1</span>
+}</code></pre>
+    </section>
+
+    <!-- Section 10: Best Practices -->
+    <section id="best-practices">
+      <h2><span class="section-number">10</span> Best Practices</h2>
+
+      <div class="card card-green">
+        <h4>1. Always Test First</h4>
+        <p>Run <code>logrotate -d /etc/logrotate.d/myapp</code> (debug/dry-run mode) before deploying any new configuration. This validates syntax and shows what would happen without making changes.</p>
+      </div>
+
+      <div class="card card-green">
+        <h4>2. Use missingok and notifempty</h4>
+        <p>These prevent unnecessary errors and wasted rotation cycles. A missing log shouldn't crash your rotation, and an empty log doesn't need rotating.</p>
+      </div>
+
+      <div class="card card-green">
+        <h4>3. Use sharedscripts for Wildcard Patterns</h4>
+        <p>When a block matches multiple files (e.g., <code>/var/log/nginx/*.log</code>), use <code>sharedscripts</code> so the postrotate script (e.g., service reload) runs only once instead of once per file.</p>
+      </div>
+
+      <div class="card card-green">
+        <h4>4. Prefer delaycompress with Long-Running Processes</h4>
+        <p>Some processes may still write to the previous log file briefly after rotation. <code>delaycompress</code> keeps the most recent rotated file uncompressed so these writes don't fail.</p>
+      </div>
+
+      <div class="card card-green">
+        <h4>5. Use the su Directive for Non-Root Directories</h4>
+        <p>If logrotate runs as root but the log directory is owned by an application user, use <code>su user group</code> to avoid permission issues and follow the principle of least privilege.</p>
+      </div>
+
+      <div class="card card-yellow">
+        <h4>6. Be Careful with Wildcards</h4>
+        <p>A bare <code>*</code> wildcard will match previously rotated files too. Use specific patterns like <code>*.log</code> and/or use <code>olddir</code> to move rotated files out of the match path.</p>
+      </div>
+
+      <div class="highlight-warn highlight">
+        <strong>Warning:</strong> <code>copytruncate</code> has a small race condition &mdash; data written between the copy and the truncate is lost. Only use it when the application truly cannot be told to reopen its log file. Prefer <code>create</code> + a postrotate signal (e.g., <code>SIGHUP</code>) when possible.
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>Logrotate Training Document &middot; prepared by oramad &middot; 20-March-2026</p>
+    <p>Project : <a href="https://github.com/logrotate/logrotate" target="_blank" rel="noopener noreferrer nofollow">https://github.com/logrotate/logrotate</a></p>
+  </footer>
+
+</body>
+</html>
